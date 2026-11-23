@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Train a small U-Net from scratch on CPU and write a validated mask ZIP.
+"""Train a GridGNN-UNet from scratch on CPU and write a validated mask ZIP.
 
 The complete official training partition is used. No test labels, external
 weights, training subsets, or network access are used by this program.
@@ -37,8 +37,9 @@ def letterbox(image, size=256, *, mask=False):
     return np.asarray(canvas).copy(), (left, top, new_width, new_height)
 
 
-def build_unet(torch):
+def build_grid_gnn_unet(torch):
     nn = torch.nn
+    functional = torch.nn.functional
 
     def block(in_channels, out_channels):
         return nn.Sequential(nn.Conv2d(in_channels, out_channels, 3, padding=1),
@@ -46,11 +47,40 @@ def build_unet(torch):
                              nn.Conv2d(out_channels, out_channels, 3, padding=1),
                              nn.GroupNorm(4, out_channels), nn.ReLU(inplace=True))
 
-    class TinyUNet(nn.Module):
+    class GridGraphLayer(nn.Module):
+        """Message passing on the four-neighbour graph formed by a feature map.
+
+        Each spatial location is a graph node. Edges join up, down, left, and
+        right neighbours; no wraparound edges are introduced at image borders.
+        """
+        def __init__(self, channels):
+            super().__init__()
+            self.self_projection = nn.Conv2d(channels, channels, 1, bias=False)
+            self.neighbour_projection = nn.Conv2d(channels, channels, 1, bias=False)
+            self.norm = nn.GroupNorm(4, channels)
+
+        def forward(self, features):
+            neighbours = (
+                functional.pad(features[:, :, :-1, :], (0, 0, 1, 0)) +
+                functional.pad(features[:, :, 1:, :], (0, 0, 0, 1)) +
+                functional.pad(features[:, :, :, :-1], (1, 0, 0, 0)) +
+                functional.pad(features[:, :, :, 1:], (0, 1, 0, 0))
+            )
+            height, width = features.shape[-2:]
+            degree = features.new_full((1, 1, height, width), 4.)
+            degree[:, :, 0, :] -= 1
+            degree[:, :, -1, :] -= 1
+            degree[:, :, :, 0] -= 1
+            degree[:, :, :, -1] -= 1
+            return functional.relu(self.norm(self.self_projection(features) +
+                                             self.neighbour_projection(neighbours / degree)), inplace=True)
+
+    class GridGNNUNet(nn.Module):
         def __init__(self):
             super().__init__()
             self.enc1, self.enc2 = block(3, 8), block(8, 16)
             self.enc3, self.center = block(16, 32), block(32, 64)
+            self.graph1, self.graph2 = GridGraphLayer(64), GridGraphLayer(64)
             self.dec3, self.dec2, self.dec1 = block(96, 32), block(48, 16), block(24, 8)
             self.out = nn.Conv2d(8, 1, 1)
             self.pool = nn.MaxPool2d(2)
@@ -60,12 +90,13 @@ def build_unet(torch):
             b = self.enc2(self.pool(a))
             c = self.enc3(self.pool(b))
             d = self.center(self.pool(c))
+            d = self.graph2(self.graph1(d))
             d = self.dec3(torch.cat([nn.functional.interpolate(d, size=c.shape[-2:], mode="bilinear", align_corners=False), c], dim=1))
             d = self.dec2(torch.cat([nn.functional.interpolate(d, size=b.shape[-2:], mode="bilinear", align_corners=False), b], dim=1))
             d = self.dec1(torch.cat([nn.functional.interpolate(d, size=a.shape[-2:], mode="bilinear", align_corners=False), a], dim=1))
             return self.out(d)
 
-    return TinyUNet()
+    return GridGNNUNet()
 
 
 def _resolve_data(root, relative):
@@ -158,7 +189,8 @@ def main():
             test_geometries.append(geometry)
         test_x = torch.from_numpy(np.stack(test_x).transpose(0, 3, 1, 2))
         report["preprocessing_seconds"] = time.monotonic() - started
-        model = build_unet(torch).cpu()
+        model = build_grid_gnn_unet(torch).cpu()
+        report["model"] = "GridGNN-UNet (two learned four-neighbour message-passing layers)"
         report["parameters"] = sum(parameter.numel() for parameter in model.parameters())
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         bce = torch.nn.BCEWithLogitsLoss()

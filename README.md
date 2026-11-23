@@ -41,7 +41,7 @@ DERMA/
 │   ├── public_key.pem           # use this to encrypt submissions
 │   └── encrypt.py
 ├── competition/                 # validation, scoring and leaderboard code
-├── baseline.py                  # local CNN pipeline check (not eligible)
+├── baseline.py                  # GridGNN-UNet baseline
 ├── submissions/
 │   └── <team>/                  # your encrypted prediction + metadata
 └── leaderboard/
@@ -56,12 +56,17 @@ DERMA/
 
 ```bash
 pip install -r requirements.txt
+pip install -r requirements-baseline.txt
 ```
 
 ### 2. Train and predict
 
-Train a GNN method using every image in `data/public/train/`. No eligible
-reference model is supplied.
+Train a GNN method using every image in `data/public/train/`. The supplied
+GridGNN-UNet baseline writes a valid prediction ZIP:
+
+```bash
+python baseline.py --data data/public --output outputs/predictions.zip
+```
 
 The ZIP contains `manifest.json` plus one `masks/<image_id>.png` file for
 every test image. Use 0 for background and 255 for lesion.
@@ -107,10 +112,11 @@ scores and publishes your result automatically.
 
 ---
 
-## Local pipeline check
+## Baseline
 
-`baseline.py` is a CNN-only local smoke check for the submission format. It is
-not a valid competition entry and is excluded from the leaderboard.
+`baseline.py` uses GridGNN-UNet: a U-Net with two learned four-neighbour graph
+message-passing layers at its bottleneck. It is trained from scratch on all 900
+training images and predicts all 379 test images on CPU.
 
 ---
 
