@@ -1,0 +1,7 @@
+{
+  "team": "MuhammadIbrahimIsah",
+  "model": "GridGNN-UNet",
+  "type": "human",
+  "notes": "20 epochs from scratch on the full official training partition; two learned four-neighbour graph message-passing layers.",
+  "run": {"seed": 25, "threads": 4, "epochs": 20, "weights": "none"}
+}

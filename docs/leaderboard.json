@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "rank": 1,
+    "timestamp_utc": "2026-11-23T20:39:48Z",
+    "benchmark_id": "derma-v1",
+    "team": "MuhammadIbrahimIsah",
+    "type": "human",
+    "model": "GridGNN-UNet",
+    "notes": "20 epochs from scratch on the full official training partition; two learned four-neighbour graph message-passing layers.",
+    "run": {
+      "seed": 25,
+      "threads": 4,
+      "epochs": 20,
+      "weights": "none"
+    },
+    "score": 0.8875213063469007,
+    "metrics": {
+      "f1_score": 0.8875213063469007
+    },
+    "primary_metric": "mean_foreground_f1",
+    "pr_number": 1,
+    "submission_sha256": "1a8012b8ceeebb27c94e3d9c99d4e25e30f7ebd5d90dc2f7d02815f44f5cdc30"
+  }
+]
