@@ -30,6 +30,14 @@ masks at each image's native dimensions.
 The original data is [ISIC 2016 Task 1](https://challenge.isic-archive.com/data/),
 released under CC0.
 
+### Annotation example
+
+<img src="docs/assets/derma_segmentation_example.png" alt="Original dermoscopic image beside its ground-truth lesion mask overlay" width="100%">
+
+The left panel is an official training image. The right panel overlays its
+ground-truth lesion mask in red, with a yellow boundary, to show the target
+for semantic segmentation.
+
 ---
 
 ## Repository Structure
