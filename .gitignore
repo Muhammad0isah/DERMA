@@ -36,3 +36,5 @@ venv/
 .coverage
 .DS_Store
 leaderboard/.record.lock
+tests/
+.github/workflows/checks.yml
