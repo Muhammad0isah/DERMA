@@ -1,0 +1,6 @@
+{
+  "team": "MuhammadIbrahimIsah",
+  "model": "TinyUNet CPU Baseline",
+  "type": "human",
+  "notes": "Official DERMA reference baseline: 20 epochs, seed 25, 4 CPU threads."
+}

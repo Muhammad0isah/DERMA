@@ -1,0 +1,18 @@
+{
+  "benchmark_id": "derma-v1",
+  "created_utc": "2026-11-23T13:35:33.336378+00:00",
+  "files": {
+    "ground_truth.enc": {
+      "bytes": 2979538,
+      "sha256": "a0fd890a89f90404d8634526bdb7636cc16977ca4534de3363286c0f7a7d62bb"
+    },
+    "test_manifest.json": {
+      "bytes": 83972,
+      "sha256": "d9d7b776c695fdd1665cbb01e2c6ffa6ab8d0b23230170b9b8165d9df6d7a58e"
+    }
+  },
+  "image_count": 379,
+  "public_key_sha256": "a4e32aca6be0110f5e0fd4b6ef75f30d10a7567fa795c2e862811c92e696c6fb",
+  "purpose": "ground_truth",
+  "version": 1
+}

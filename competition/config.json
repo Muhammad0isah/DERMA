@@ -1,0 +1,17 @@
+{
+  "benchmark_id": "derma-v1",
+  "task": "semantic_segmentation",
+  "dataset": "Complete ISIC 2016 Task 1",
+  "dataset_license": "CC0-1.0",
+  "official_training_images": 900,
+  "official_test_images": 379,
+  "seed": 25,
+  "corruption": {"name": "additive_gaussian_rgb", "sigma_uint8": 3.0, "rounding": "nearest_then_clip", "output": "PNG_lossless"},
+  "submission_format": "ZIP with manifest.json and masks/{image_id}.png",
+  "primary_metric": "mean_per_image_foreground_f1",
+  "greater_is_better": true,
+  "empty_truth_and_prediction": 1.0,
+  "max_cpu_seconds": 10800,
+  "cpu_threads": 4,
+  "status": "implementation_ready_full_archive_audit_and_cpu_pilot_pending"
+}
