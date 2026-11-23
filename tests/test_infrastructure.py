@@ -76,7 +76,7 @@ class SubmissionTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         (self.root / "competition").mkdir()
         (self.root / "competition/config.json").write_text(json.dumps({"benchmark_id": "test-v1"}))
-        self.metadata = {"team": "team-one", "type": "human", "model": "none"}
+        self.metadata = {"team": "team-one", "type": "human", "model": "none", "model_family": "gnn"}
         self.result = {"score": 0.75, "primary_metric": "metric", "metrics": {"metric": 0.75}}
 
     def record(self, **overrides) -> dict:
@@ -92,7 +92,7 @@ class SubmissionTests(unittest.TestCase):
         self.assertEqual(self.record(), original)
         self.assertEqual(self.record(actor="bob"), original)
         for fields in ({"pr_number": 2}, {"actor": "ALICE", "pr_number": 2},
-                       {"metadata": {"team": "team-one", "type": "llm", "model": "a-model"}, "pr_number": 3}):
+                       {"metadata": {"team": "team-one", "type": "llm", "model": "a-model", "model_family": "gnn"}, "pr_number": 3}):
             with self.subTest(fields=fields), self.assertRaises(SubmissionError):
                 self.record(**fields)
         self.record(team="team-two", actor="bob", pr_number=2)
@@ -107,6 +107,10 @@ class SubmissionTests(unittest.TestCase):
         self.assertFalse((self.root / "leaderboard/records.json").exists())
         self.record()
 
+    def test_gnn_model_family_is_required(self) -> None:
+        with self.assertRaisesRegex(SubmissionError, "GNN methods only"):
+            self.record(metadata={"team": "team-one", "type": "human", "model": "cnn"})
+
     def test_numeric_precision_and_ties(self) -> None:
         self.record(result={"score": 0.750000001})
         self.record(actor="bob", team="team-two", pr_number=2, result={"score": 0.750000002})
@@ -116,7 +120,7 @@ class SubmissionTests(unittest.TestCase):
         self.assertEqual(rows[2]["f1_score"], "0.750000001")
 
     def test_untrusted_metadata_is_plain_text(self) -> None:
-        self.record(metadata={"team": "team-one", "type": "llm", "model": "=HYPERLINK(\"bad\")", "notes": "<script>alert(1)</script>|\nhi"})
+        self.record(metadata={"team": "team-one", "type": "llm", "model": "=HYPERLINK(\"bad\")", "model_family": "gnn", "notes": "<script>alert(1)</script>|\nhi"})
         rows = list(csv.DictReader(io.StringIO((self.root / "docs/leaderboard.csv").read_text())))
         self.assertTrue(rows[0]["model"].startswith("'="))
         markdown = (self.root / "leaderboard/leaderboard.md").read_text()
@@ -125,7 +129,7 @@ class SubmissionTests(unittest.TestCase):
         self.assertIn("textContent", page)
         self.assertNotIn("innerHTML", page)
         with self.assertRaises(SubmissionError):
-            parse_metadata({"team": "team-one", "type": "human", "model": "none", "untrusted": "field"})
+            parse_metadata({"team": "team-one", "type": "human", "model": "none", "model_family": "gnn", "untrusted": "field"})
         for value in ("=cmd", "  +cmd", "@SUM(1)", "\tbad", "\rnew"):
             self.assertTrue(csv_safe(value).startswith("'"))
 

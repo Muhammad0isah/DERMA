@@ -1,18 +1,1 @@
-[
-  {
-    "rank": 1,
-    "timestamp_utc": "2026-11-23T14:09:43Z",
-    "benchmark_id": "derma-v1",
-    "team": "MuhammadIbrahimIsah",
-    "type": "human",
-    "model": "TinyUNet CPU Baseline",
-    "notes": "Official DERMA reference baseline: 20 epochs, seed 25, 4 CPU threads.",
-    "score": 0.8868970087260137,
-    "metrics": {
-      "f1_score": 0.8868970087260137
-    },
-    "primary_metric": "mean_foreground_f1",
-    "pr_number": 1,
-    "submission_sha256": "3be9407a70156ec5354affdd48c81472ffb414728ebdb4bf0a48dca65a15e2f0"
-  }
-]
+[]

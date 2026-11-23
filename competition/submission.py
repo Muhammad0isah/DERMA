@@ -32,14 +32,16 @@ def _text(value: object, name: str, limit: int, required: bool = True) -> str:
 def parse_metadata(data: object) -> dict:
     if not isinstance(data, dict):
         raise SubmissionError("Metadata must be a JSON object")
-    if set(data) - {"team", "type", "model", "notes", "run", "runlog"}:
+    if set(data) - {"team", "type", "model", "model_family", "notes", "run", "runlog"}:
         raise SubmissionError("Unsupported metadata fields")
     if not isinstance(data.get("team"), str) or not TEAM_PATTERN.fullmatch(data["team"]):
         raise SubmissionError("Metadata team must match [A-Za-z0-9][A-Za-z0-9_-]{0,39}")
     if data.get("type") not in {"human", "llm", "human+llm"}:
         raise SubmissionError("Metadata type must be human, llm or human+llm")
+    if data.get("model_family") != "gnn":
+        raise SubmissionError("DERMA accepts GNN methods only: model_family must be gnn")
     result = {"team": data["team"], "type": data["type"], "model": _text(data.get("model"), "model", 160),
-              "notes": _text(data.get("notes", ""), "notes", 4000, required=False)}
+              "model_family": "gnn", "notes": _text(data.get("notes", ""), "notes", 4000, required=False)}
     if "runlog" in data:
         result["runlog"] = _text(data["runlog"], "runlog", 2000, required=False)
     if "run" in data:

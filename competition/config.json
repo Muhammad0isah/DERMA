@@ -8,6 +8,7 @@
   "seed": 25,
   "corruption": {"name": "additive_gaussian_rgb", "sigma_uint8": 3.0, "rounding": "nearest_then_clip", "output": "PNG_lossless"},
   "submission_format": "ZIP with manifest.json and masks/{image_id}.png",
+  "model_requirement": "gnn_only",
   "primary_metric": "mean_per_image_foreground_f1",
   "greater_is_better": true,
   "empty_truth_and_prediction": 1.0,

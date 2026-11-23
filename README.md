@@ -41,7 +41,7 @@ DERMA/
 │   ├── public_key.pem           # use this to encrypt submissions
 │   └── encrypt.py
 ├── competition/                 # validation, scoring and leaderboard code
-├── baseline.py                  # CPU U-Net baseline
+├── baseline.py                  # local CNN pipeline check (not eligible)
 ├── submissions/
 │   └── <team>/                  # your encrypted prediction + metadata
 └── leaderboard/
@@ -56,17 +56,12 @@ DERMA/
 
 ```bash
 pip install -r requirements.txt
-pip install -r requirements-baseline.txt
 ```
 
 ### 2. Train and predict
 
-Train using every image in `data/public/train/`. The supplied baseline trains
-a from-scratch CPU U-Net and writes a valid prediction ZIP:
-
-```bash
-python baseline.py --data data/public --output outputs/predictions.zip
-```
+Train a GNN method using every image in `data/public/train/`. No eligible
+reference model is supplied.
 
 The ZIP contains `manifest.json` plus one `masks/<image_id>.png` file for
 every test image. Use 0 for background and 255 for lesion.
@@ -83,7 +78,8 @@ Create `submissions/YOUR_TEAM_NAME/meta.json`:
 ```json
 {
   "team": "YOUR_TEAM_NAME",
-  "model": "My U-Net",
+  "model": "My GNN segmenter",
+  "model_family": "gnn",
   "type": "human",
   "notes": "Short description"
 }
@@ -105,18 +101,17 @@ scores and publishes your result automatically.
 ## Rules
 
 - One valid submission per team. The `team` field inside `meta.json` must match the folder name.
+- Only GNN-based methods are eligible. `meta.json` must set `"model_family": "gnn"`.
 - Submit encrypted predictions only.
 - CPU only: maximum 4 threads and 3 hours total training/prediction time.
 - Train only with the released training data; do not use test masks or external pretrained weights.
 
 ---
 
-## Baseline
+## Local pipeline check
 
-`baseline.py` uses a small U-Net initialized from scratch. It uses all 900
-training images, predicts all 379 test images, and restores masks to native
-dimensions. The baseline is a reference implementation, not a published
-performance claim.
+`baseline.py` is a CNN-only local smoke check for the submission format. It is
+not a valid competition entry and is excluded from the leaderboard.
 
 ---
 

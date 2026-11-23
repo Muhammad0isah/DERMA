@@ -29,7 +29,7 @@ class FakeAPI:
                          "head_sha": HEAD, "actor": "alice", "pr_number": 17}
         self.pull = {"state": "open", "changed_files": 2, "head": {"sha": HEAD, "repo": {"full_name": HEAD_REPOSITORY}},
                      "base": {"repo": {"full_name": REPOSITORY}}, "user": {"login": "alice"}}
-        self.contents = {"submission.enc": b"encrypted predictions", "meta.json": json.dumps({"team": TEAM, "type": "human", "model": "none"}).encode()}
+        self.contents = {"submission.enc": b"encrypted predictions", "meta.json": json.dumps({"team": TEAM, "type": "human", "model": "none", "model_family": "gnn"}).encode()}
         self.files = [{"filename": f"submissions/{TEAM}/{name}", "sha": blob_sha(value), "status": "added",
                        "raw_url": "https://attacker.invalid/never-follow"} for name, value in self.contents.items()]
         self.final_tree = {"truncated": False, "tree": [{"path": name, "mode": "100644", "type": "blob",
