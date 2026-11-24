@@ -40,6 +40,24 @@ for semantic segmentation.
 
 ---
 
+## Download the dataset
+
+Run the following commands to download and prepare ISIC 2016 Task 1:
+
+```bash
+python scripts/download_data.py --download --output evaluation-private/source
+python scripts/prepare_data.py \
+  --train-images evaluation-private/source/ISBI2016_ISIC_Part1_Training_Data.zip \
+  --train-masks evaluation-private/source/ISBI2016_ISIC_Part1_Training_GroundTruth.zip \
+  --test-images evaluation-private/source/ISBI2016_ISIC_Part1_Test_Data.zip \
+  --test-masks evaluation-private/source/ISBI2016_ISIC_Part1_Test_GroundTruth.zip \
+  --output-root .
+```
+
+Use `data/public/` for training and prediction.
+
+---
+
 ## Repository Structure
 
 ```
@@ -64,7 +82,6 @@ DERMA/
 
 ```bash
 pip install -r requirements.txt
-pip install -r requirements-baseline.txt
 ```
 
 ### 2. Train and predict
