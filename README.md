@@ -23,7 +23,6 @@ LLM solutions on dermoscopic skin-lesion images.
 ## Dataset
 
 DERMA retains all official images, all masks, and the original train/test split.
-Images receive reproducible mild RGB Gaussian noise (seed 25, sigma 3/255).
 Training masks are unchanged. Your test predictions must be 0/255 grayscale PNG
 masks at each image's native dimensions.
 
@@ -37,6 +36,16 @@ released under CC0.
 The left panel is an official training image. The right panel overlays its
 ground-truth lesion mask in red, with a yellow boundary, to show the target
 for semantic segmentation.
+
+### Dataset modification
+
+To make DERMA different from the original ISIC 2016 release, we apply the
+following reproducible modification while retaining the complete dataset:
+
+| Modification | Effect |
+| --- | --- |
+| Image noise | Every image receives additive RGB Gaussian noise with standard deviation 3 pixel values (3/255 on a 0–1 scale). Seed 25 makes the result reproducible. |
+| Labels and split | Lesion masks, image dimensions, classes, and the official train/test split are unchanged. |
 
 ---
 
